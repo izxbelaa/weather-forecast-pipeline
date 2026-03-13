@@ -153,21 +153,22 @@ if view_option == "Dashboard":
     st.markdown("---")
 
     st.subheader("Weather Trends")
+    indexed_df = filtered_df.set_index("timestamp")
     c1, c2 = st.columns(2)
 
     with c1:
         st.markdown("**Temperature Trend**")
-        st.line_chart(filtered_df.set_index("timestamp")[["temperature_2m"]])
+        st.line_chart(indexed_df[["temperature_2m"]])
 
         st.markdown("**Wind Speed Trend**")
-        st.line_chart(filtered_df.set_index("timestamp")[["wind_speed_10m"]])
+        st.line_chart(indexed_df[["wind_speed_10m"]])
 
     with c2:
         st.markdown("**Humidity Trend**")
-        st.line_chart(filtered_df.set_index("timestamp")[["relative_humidity_2m"]])
+        st.line_chart(indexed_df[["relative_humidity_2m"]])
 
         st.markdown("**Precipitation Trend**")
-        st.line_chart(filtered_df.set_index("timestamp")[["precipitation"]])
+        st.line_chart(indexed_df[["precipitation"]])
 
     st.markdown("---")
 
