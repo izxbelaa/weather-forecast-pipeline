@@ -130,6 +130,4 @@ Initial location: Limassol, Cyprus
 
 ------------------------------------------------------------------------
 
-## License
 
-Academic project for CSE525 -- Data Science.
