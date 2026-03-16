@@ -13,3 +13,16 @@ CREATE TABLE IF NOT EXISTS weather_data (
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(city, timestamp)
 );
+CREATE TABLE IF NOT EXISTS predictions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    city TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+
+    predicted_temperature REAL,
+    rain_probability REAL,
+    rain_prediction INTEGER,
+
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(city, timestamp)
+);
