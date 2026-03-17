@@ -1,6 +1,6 @@
-from api_client import fetch_weather
-from parser import parse_weather
-from cleaner import clean_data
+from backend.api_client import fetch_weather
+from backend.parser import parse_weather
+from backend.cleaner import clean_data
 
 import sys
 from pathlib import Path

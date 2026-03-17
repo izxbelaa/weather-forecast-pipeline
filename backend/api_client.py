@@ -1,5 +1,5 @@
 import requests
-from config import LATITUDE, LONGITUDE, HOURLY_VARS, API_URL, START_DATE, END_DATE
+from backend.config import LATITUDE, LONGITUDE, HOURLY_VARS, API_URL, START_DATE, END_DATE
 
 
 def fetch_weather():
