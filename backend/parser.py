@@ -1,5 +1,5 @@
 import pandas as pd
-from config import CITY, LATITUDE, LONGITUDE
+from backend.config import CITY, LATITUDE, LONGITUDE
 
 
 def parse_weather(json_data):
