@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime
 
 
 def clean_data(df):
@@ -6,6 +7,8 @@ def clean_data(df):
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
 
     df = df.dropna(subset=["timestamp"])
+    now = datetime.now()
+    df = df[df["timestamp"] <= now]
     df = df.dropna()
 
     df = df.drop_duplicates()
