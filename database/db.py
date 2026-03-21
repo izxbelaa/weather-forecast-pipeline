@@ -60,23 +60,21 @@ def insert_weather_data(df: pd.DataFrame):
     conn.close()
 
 
-def insert_prediction(city, timestamp, predicted_temperature, rain_probability, rain_prediction):
+def insert_prediction(weather_data_id, predicted_temperature, rain_probability, rain_prediction):
 
     conn = get_connection()
 
     query = """
-    INSERT OR REPLACE INTO predictions (
-        city,
-        timestamp,
+    INSERT INTO predictions (
+        weather_data_id,
         predicted_temperature,
         rain_probability,
         rain_prediction
-    ) VALUES (?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?)
     """
 
     conn.execute(query, (
-        city,
-        timestamp,
+        weather_data_id,
         predicted_temperature,
         rain_probability,
         rain_prediction

@@ -112,8 +112,7 @@ prediction_timestamp = latest_row["timestamp"] + timedelta(hours=1)
 # Store prediction
 # ---------------------------
 insert_prediction(
-    city=latest_row["city"],
-    timestamp=prediction_timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+    weather_data_id=int(latest_row["id"]),
     predicted_temperature=float(predicted_temperature),
     rain_probability=float(rain_probability),
     rain_prediction=int(rain_prediction)
