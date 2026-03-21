@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS weather_data (
 );
 CREATE TABLE IF NOT EXISTS predictions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    city TEXT NOT NULL,
-    timestamp TEXT NOT NULL,
+
+    weather_data_id INTEGER,
 
     predicted_temperature REAL,
     rain_probability REAL,
@@ -24,5 +24,5 @@ CREATE TABLE IF NOT EXISTS predictions (
 
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
-    UNIQUE(city, timestamp)
+    FOREIGN KEY (weather_data_id) REFERENCES weather_data(id)
 );
