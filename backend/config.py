@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 
-CITY = "Limassol"
-
-LATITUDE = 34.6786
-LONGITUDE = 33.0413
+CITIES = [
+    {"city": "Limassol", "latitude": 34.6786, "longitude": 33.0413},
+    {"city": "Nicosia", "latitude": 35.1856, "longitude": 33.3823},
+]
 
 today = datetime.today()
 

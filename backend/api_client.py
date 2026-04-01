@@ -1,12 +1,11 @@
 import requests
-from backend.config import LATITUDE, LONGITUDE, HOURLY_VARS, API_URL, START_DATE, END_DATE
+from backend.config import HOURLY_VARS, API_URL, START_DATE, END_DATE
 
 
-def fetch_weather():
-
+def fetch_weather(latitude, longitude):
     params = {
-        "latitude": LATITUDE,
-        "longitude": LONGITUDE,
+        "latitude": latitude,
+        "longitude": longitude,
         "start_date": START_DATE,
         "end_date": END_DATE,
         "hourly": ",".join(HOURLY_VARS),

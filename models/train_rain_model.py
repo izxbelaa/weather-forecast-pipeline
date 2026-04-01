@@ -9,22 +9,19 @@ def categorize_rain(precip):
         return 0  # No Rain
     elif precip <= 2.5:
         return 1  # Light Rain
-    elif precip <= 7.6:
-        return 2  # Moderate Rain
     else:
-        return 3  # Heavy Rain
+        return 2  # Moderate/Heavy Rain
 
 
 RAIN_LABELS = {
     0: "No Rain",
     1: "Light Rain",
-    2: "Moderate Rain",
-    3: "Heavy Rain",
+    2: "Moderate/Heavy Rain",
 }
 
 # --- Load data ---
 conn = sqlite3.connect("database/weather.db")
-df = pd.read_sql_query("SELECT * FROM weather_data ORDER BY timestamp ASC", conn)
+df = pd.read_sql_query("SELECT * FROM weather_data ORDER BY city, timestamp ASC", conn)
 conn.close()
 df = df.dropna().copy()
 
@@ -33,13 +30,20 @@ df["timestamp"] = pd.to_datetime(df["timestamp"])
 df["hour"] = df["timestamp"].dt.hour
 df["day_of_week"] = df["timestamp"].dt.dayofweek
 
-# --- Create multiclass target from next-hour precipitation ---
-df["precipitation_next_hour"] = df["precipitation"].shift(-1)
+# --- Create target per city ---
+df["precipitation_next_hour"] = df.groupby("city")["precipitation"].shift(-1)
 df = df.dropna().copy()
 df["rain_category_next_hour"] = df["precipitation_next_hour"].apply(categorize_rain)
 
+print("\nRain category distribution:")
+counts = df["rain_category_next_hour"].value_counts().sort_index()
+for class_id, count in counts.items():
+    print(f"{RAIN_LABELS[class_id]}: {count}")
+
 # --- Features ---
 feature_cols = [
+    "latitude",
+    "longitude",
     "temperature_2m",
     "relative_humidity_2m",
     "wind_speed_10m",
@@ -76,20 +80,22 @@ evaluate_rain_model(y_test, pred)
 
 # --- Sample predictions ---
 results = pd.DataFrame({
-    "actual": y_test.map(RAIN_LABELS),
-    "predicted": pd.Series(pred, index=y_test.index).map(RAIN_LABELS),
+    "city": df.iloc[split_index:]["city"].values,
+    "actual": y_test.map(RAIN_LABELS).values,
+    "predicted": pd.Series(pred, index=y_test.index).map(RAIN_LABELS).values,
 })
 
 print("\nSample predictions vs actual:")
 print(results.head(10))
 
-# --- Predict next hour from latest row ---
-latest_features = X.iloc[[-1]]
+# --- Predict next hour for latest overall row ---
+latest_row = df.sort_values("timestamp").iloc[-1]
+latest_features = X.loc[[latest_row.name]]
 
 next_rain_pred = model.predict(latest_features)[0]
 next_rain_proba = model.predict_proba(latest_features)[0]
 
-print(f"\nPredicted next hour rain category: {RAIN_LABELS[next_rain_pred]}")
+print(f"\nPredicted next hour rain category for {latest_row['city']}: {RAIN_LABELS[next_rain_pred]}")
 print("Class probabilities:")
 for class_idx, probability in zip(model.classes_, next_rain_proba):
     print(f"  {RAIN_LABELS[class_idx]}: {probability * 100:.2f}%")

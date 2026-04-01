@@ -1,26 +1,31 @@
 from backend.api_client import fetch_weather
 from backend.parser import parse_weather
 from backend.cleaner import clean_data
-
-import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+from backend.config import CITIES
 
 from database.db import init_db, insert_weather_data
+import pandas as pd
 
 
 def run():
 
     init_db()
 
-    data = fetch_weather()
+    all_dataframes = []
 
-    df = parse_weather(data)
+    for location in CITIES:
+        city = location["city"]
+        latitude = location["latitude"]
+        longitude = location["longitude"]
 
-    df = clean_data(df)
+        data = fetch_weather(latitude, longitude)
+        df = parse_weather(data, city, latitude, longitude)
+        df = clean_data(df)
+        all_dataframes.append(df)
 
-    insert_weather_data(df)
+    final_df = pd.concat(all_dataframes, ignore_index=True)
+
+    insert_weather_data(final_df)
 
     print("Weather data stored successfully")
 
