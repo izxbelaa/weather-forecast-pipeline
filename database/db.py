@@ -58,3 +58,27 @@ def insert_weather_data(df: pd.DataFrame):
 
     conn.commit()
     conn.close()
+
+
+def insert_prediction(weather_data_id, predicted_temperature, rain_probability, rain_prediction):
+
+    conn = get_connection()
+
+    query = """
+    INSERT INTO predictions (
+        weather_data_id,
+        predicted_temperature,
+        rain_probability,
+        rain_prediction
+    ) VALUES (?, ?, ?, ?)
+    """
+
+    conn.execute(query, (
+        weather_data_id,
+        predicted_temperature,
+        rain_probability,
+        rain_prediction
+    ))
+
+    conn.commit()
+    conn.close()

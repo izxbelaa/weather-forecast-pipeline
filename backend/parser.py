@@ -1,9 +1,7 @@
 import pandas as pd
-from config import CITY, LATITUDE, LONGITUDE
 
 
-def parse_weather(json_data):
-
+def parse_weather(json_data, city, latitude, longitude):
     hourly = json_data["hourly"]
 
     df = pd.DataFrame({
@@ -16,8 +14,8 @@ def parse_weather(json_data):
         "cloud_cover": hourly["cloud_cover"]
     })
 
-    df["city"] = CITY
-    df["latitude"] = LATITUDE
-    df["longitude"] = LONGITUDE
+    df["city"] = city
+    df["latitude"] = latitude
+    df["longitude"] = longitude
 
     return df
