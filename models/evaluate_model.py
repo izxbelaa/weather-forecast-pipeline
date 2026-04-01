@@ -26,13 +26,13 @@ def evaluate_temperature_model(y_true, y_pred):
 
 def evaluate_rain_model(y_true, y_pred):
     """
-    Evaluate classification model for next-hour rain prediction.
+    Evaluate multi-class classification model for next-hour rain prediction.
     """
 
     accuracy = accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, zero_division=0)
-    recall = recall_score(y_true, y_pred, zero_division=0)
-    f1 = f1_score(y_true, y_pred, zero_division=0)
+    precision = precision_score(y_true, y_pred, average="weighted", zero_division=0)
+    recall = recall_score(y_true, y_pred, average="weighted", zero_division=0)
+    f1 = f1_score(y_true, y_pred, average="weighted", zero_division=0)
 
     print("\nRain Model Evaluation")
     print("-----------------------------")

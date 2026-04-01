@@ -5,6 +5,24 @@ from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 
 from database.db import insert_prediction
 
+def categorize_rain(mm):
+    if mm == 0:
+        return 0          # No Rain
+    elif mm <= 2.5:
+        return 1          # Light Rain
+    elif mm <= 7.6:
+        return 2          # Moderate Rain
+    else:
+        return 3          # Heavy Rain
+
+
+RAIN_LABELS = {
+    0: "No Rain",
+    1: "Light Rain",
+    2: "Moderate Rain",
+    3: "Heavy Rain",
+}
+
 
 # ---------------------------
 # Load weather data
@@ -62,8 +80,9 @@ temp_model.fit(X_train_temp, y_train_temp)
 # ---------------------------
 # RAIN MODEL
 # ---------------------------
-df["rain_next_hour"] = (df["precipitation"].shift(-1) > 0).astype(int)
+df["precipitation_next_hour"] = df["precipitation"].shift(-1)
 df_rain = df.dropna().copy()
+df_rain["rain_category_next_hour"] = df_rain["precipitation_next_hour"].apply(categorize_rain)
 
 rain_features = [
     "temperature_2m",
@@ -77,7 +96,7 @@ rain_features = [
 ]
 
 X_rain = df_rain[rain_features]
-y_rain = df_rain["rain_next_hour"]
+y_rain = df_rain["rain_category_next_hour"]
 
 split_index = int(len(df_rain) * 0.8)
 
@@ -97,13 +116,14 @@ rain_model.fit(X_train_rain, y_train_rain)
 # ---------------------------
 latest_row = df.iloc[-1]
 
-latest_features_temp = latest_row[temp_features].values.reshape(1, -1)
-latest_features_rain = latest_row[rain_features].values.reshape(1, -1)
+latest_features_temp = pd.DataFrame([latest_row[temp_features]], columns=temp_features)
+latest_features_rain = pd.DataFrame([latest_row[rain_features]], columns=rain_features)
 
 predicted_temperature = temp_model.predict(latest_features_temp)[0]
 
-rain_probability = rain_model.predict_proba(latest_features_rain)[0][1] * 100
 rain_prediction = rain_model.predict(latest_features_rain)[0]
+all_probabilities = rain_model.predict_proba(latest_features_rain)[0]
+rain_probability = all_probabilities[rain_prediction] * 100
 
 # next hour timestamp
 prediction_timestamp = latest_row["timestamp"] + timedelta(hours=1)
@@ -125,5 +145,9 @@ print("-------------------")
 print(f"City: {latest_row['city']}")
 print(f"Prediction time: {prediction_timestamp}")
 print(f"Predicted temperature: {predicted_temperature:.2f} °C")
-print(f"Rain probability: {rain_probability:.2f}%")
-print(f"Rain predicted: {'Yes' if rain_prediction == 1 else 'No'}")
+print(f"Rain category: {RAIN_LABELS[rain_prediction]}")
+print(f"Model confidence: {rain_probability:.2f}%")
+
+print("\nClass probabilities:")
+for class_idx, probability in zip(rain_model.classes_, all_probabilities):
+    print(f"  {RAIN_LABELS[class_idx]}: {probability * 100:.2f}%")
