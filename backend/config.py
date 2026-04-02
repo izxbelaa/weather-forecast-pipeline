@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 CITIES = [
     {"city": "Limassol", "latitude": 34.6786, "longitude": 33.0413},
     {"city": "Nicosia", "latitude": 35.1856, "longitude": 33.3823},
+    {"city": "Larnaca", "latitude": 34.9192, "longitude": 33.6232},
+    {"city": "Paphos", "latitude": 34.7721, "longitude": 32.4297},
 ]
 
 today = datetime.today()
