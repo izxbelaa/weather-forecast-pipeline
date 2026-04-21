@@ -285,11 +285,6 @@ h1,h2,h3,h4,p,div,span,label {
     background: rgba(192,57,43,0.08);
     border-color: rgba(192,57,43,0.2);
 }
-.wg-confidence-percent {
-    color: var(--text-faint);
-    font-size: 0.72rem;
-    font-weight: 500;
-}
 .wg-confidence-note,
 .wg-city-confidence {
     color: var(--text-faint);
@@ -678,8 +673,7 @@ def get_confidence_tone(prob):
 def confidence_chip(prob, label="Confidence"):
     confidence_text = get_confidence_short(prob)
     tone = get_confidence_tone(prob)
-    percent = f'<span class="wg-confidence-percent">({int(prob)}%)</span>' if prob is not None else ""
-    return f'<span class="wg-confidence-chip {tone}">{label}: {confidence_text} {percent}</span>'
+    return f'<span class="wg-confidence-chip {tone}">{label}: {confidence_text}</span>'
 
 def get_confidence_guidance(prob):
     if prob is None:
@@ -1057,7 +1051,6 @@ with tab_main:
             <div class="wg-pill">Outlook: {predicted_rain_label}</div>
             <div class="wg-pill">Wind: {latest["wind_speed_10m"]:.1f} km/h</div>
         </div>
-        <div class="wg-confidence-note">Confidence reflects how consistent recent signals are. It is not a guarantee.</div>
     </div>
     """)
 
@@ -1079,7 +1072,7 @@ with tab_main:
         <div class="wg-card wg-summary-card">
             <div class="wg-label">Confidence</div>
             <div class="wg-summary-value">{get_confidence_short(predicted_prob)}</div>
-            <div class="wg-summary-copy">{CONFIDENCE_COPY[confidence_band]} {f"Signal strength: {int(predicted_prob)}%." if predicted_prob is not None else ""}</div>
+
         </div>
     </div>
     """)
@@ -1194,7 +1187,6 @@ with tab_compare:
                         <div class="wg-city-name">{row["city"]}</div>
                         {badge}
                         <div class="wg-city-takeaway">{tk}</div>
-                        <div class="wg-city-confidence">{city_confidence_html}</div>
                     </div>
                 </div>
                 <div>
