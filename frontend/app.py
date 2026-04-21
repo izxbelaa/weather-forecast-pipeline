@@ -16,16 +16,32 @@ DB_PATH = Path(__file__).resolve().parent.parent / "database" / "weather.db"
 
 RAIN_LABELS = {0: "Clear", 1: "Light rain", 2: "Heavy rain"}
 
+ACTIVITY_OPTIONS = [
+    "Walking 🚶",
+    "Beach 🏖️",
+    "Outdoor Sports ⚽",
+    "Driving 🚗",
+    "General outdoor activity 🌤️",
+]
+
+ACTIVITY_META = {
+    "Walking 🚶": {"name": "Walking", "emoji": "🚶"},
+    "Beach 🏖️": {"name": "Beach", "emoji": "🏖️"},
+    "Outdoor Sports ⚽": {"name": "Outdoor Sports", "emoji": "⚽"},
+    "Driving 🚗": {"name": "Driving", "emoji": "🚗"},
+    "General outdoor activity 🌤️": {"name": "General outdoor activity", "emoji": "🌤️"},
+}
+
 STATUS_META = {
-    "Safe to go out": {"tone": "good", "emoji": "●"},
-    "Use caution":    {"tone": "caution", "emoji": "●"},
-    "Stay indoors":   {"tone": "risk", "emoji": "●"},
+    "Good": {"tone": "good", "emoji": "●"},
+    "Use Caution": {"tone": "caution", "emoji": "●"},
+    "Not Recommended": {"tone": "risk", "emoji": "●"},
 }
 
 CONFIDENCE_COPY = {
-    "High confidence":     "Conditions are consistent across the latest signals.",
-    "Moderate confidence": "The outlook is directionally clear, with some variation.",
-    "Low confidence":      "Conditions may shift — plan with flexibility.",
+    "High confidence":     "Conditions look stable based on recent signals.",
+    "Moderate confidence": "The signal is useful, but conditions may vary.",
+    "Low confidence":      "Conditions may change soon — plan with flexibility.",
     "Unavailable":         "No confidence signal available yet.",
 }
 
@@ -196,6 +212,41 @@ h1,h2,h3,h4,p,div,span,label {
     max-width: 38rem;
     margin-bottom: 1.25rem;
 }
+.wg-reason-block {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
+    gap: 1rem;
+    margin: 1rem 0 1.25rem;
+}
+.wg-reason-panel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+}
+.wg-reason-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.45rem;
+}
+.wg-reason-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    font-size: 0.9rem;
+}
+.wg-suggestion {
+    color: var(--text);
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+.wg-better-city {
+    margin-top: 0.7rem;
+    color: var(--good);
+    font-weight: 600;
+}
 .wg-pills {
     display: flex;
     gap: 0.5rem;
@@ -208,6 +259,48 @@ h1,h2,h3,h4,p,div,span,label {
     padding: 0.3rem 0.75rem;
     font-size: 0.8rem;
     color: var(--text-soft);
+}
+.wg-confidence-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    border-radius: 999px;
+    padding: 0.24rem 0.62rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+.wg-confidence-chip.good {
+    color: var(--good);
+    background: rgba(26,158,106,0.08);
+    border-color: rgba(26,158,106,0.2);
+}
+.wg-confidence-chip.caution {
+    color: var(--caution);
+    background: rgba(192,125,42,0.08);
+    border-color: rgba(192,125,42,0.2);
+}
+.wg-confidence-chip.risk {
+    color: var(--risk);
+    background: rgba(192,57,43,0.08);
+    border-color: rgba(192,57,43,0.2);
+}
+.wg-confidence-percent {
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    font-weight: 500;
+}
+.wg-confidence-note,
+.wg-city-confidence {
+    color: var(--text-faint);
+    font-size: 0.76rem;
+    line-height: 1.45;
+}
+.wg-confidence-note {
+    margin-top: 0.5rem;
+}
+.wg-city-confidence {
+    margin-top: 0.35rem;
 }
 
 /* Support block */
@@ -354,7 +447,7 @@ h1,h2,h3,h4,p,div,span,label {
 
 .wg-city-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1.2fr;
+    grid-template-columns: minmax(220px, 2fr) minmax(100px, 1fr) minmax(110px, 1fr) minmax(130px, 1.2fr);
     gap: 1.5rem;
     align-items: center;
     padding: 1.25rem 1.5rem;
@@ -459,15 +552,22 @@ h1,h2,h3,h4,p,div,span,label {
 @media (max-width: 900px) {
     .wg-support-grid,
     .wg-summary-row,
-    .wg-trend-row { grid-template-columns: 1fr 1fr; }
+    .wg-trend-row,
+    .wg-reason-block { grid-template-columns: 1fr 1fr; }
     .wg-strip      { grid-template-columns: repeat(3, 1fr); }
     .wg-city-row   { grid-template-columns: 1fr; gap: 0.75rem; }
 }
 @media (max-width: 600px) {
     [data-testid="stAppViewContainer"] > .main { padding: 0 1rem 4rem !important; }
+    [data-testid="column"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+    }
     .wg-hero-card   { padding: 1.5rem; }
     .wg-support-grid,
-    .wg-summary-row { grid-template-columns: 1fr; }
+    .wg-summary-row,
+    .wg-reason-block { grid-template-columns: 1fr; }
     .wg-strip        { grid-template-columns: repeat(2, 1fr); }
     .wg-trend-row    { grid-template-columns: 1fr; }
 }
@@ -533,11 +633,62 @@ def load_all_predictions():
         df["created_at"]        = pd.to_datetime(df["created_at"])
     return df
 
+def load_latest_weather_by_city():
+    conn = get_connection()
+    df = pd.read_sql_query(
+        """
+        SELECT w.*
+        FROM weather_data w
+        JOIN (
+            SELECT city, MAX(timestamp) AS latest_timestamp
+            FROM weather_data
+            GROUP BY city
+        ) latest
+            ON w.city = latest.city
+           AND w.timestamp = latest.latest_timestamp
+        """,
+        conn,
+    )
+    conn.close()
+    if not df.empty:
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+    return df
+
 def get_confidence_band(prob):
     if prob is None:   return "Unavailable"
     if prob >= 75:     return "High confidence"
     if prob >= 50:     return "Moderate confidence"
     return "Low confidence"
+
+def get_confidence_short(prob):
+    return get_confidence_band(prob).replace(" confidence", "").replace("Unavailable", "Unavailable")
+
+def get_confidence_metric_label(rain_label):
+    return "No Rain confidence" if rain_label == "Clear" else "Forecast confidence"
+
+def get_confidence_tone(prob):
+    if prob is None:
+        return "caution"
+    if prob >= 75:
+        return "good"
+    if prob >= 50:
+        return "caution"
+    return "risk"
+
+def confidence_chip(prob, label="Confidence"):
+    confidence_text = get_confidence_short(prob)
+    tone = get_confidence_tone(prob)
+    percent = f'<span class="wg-confidence-percent">({int(prob)}%)</span>' if prob is not None else ""
+    return f'<span class="wg-confidence-chip {tone}">{label}: {confidence_text} {percent}</span>'
+
+def get_confidence_guidance(prob):
+    if prob is None:
+        return "Confidence reflects how consistent recent signals are. It is not a guarantee."
+    if prob >= 75:
+        return "Conditions look stable based on recent signals. This is not a guarantee."
+    if prob >= 50:
+        return "The signal is moderate, so keep a little flexibility in your plan."
+    return "Conditions may change soon — plan with flexibility."
 
 def get_risk_level(rain_label, confidence):
     if rain_label == "Heavy rain":                            return "High"
@@ -552,9 +703,9 @@ def get_outdoor_suitability(rain_label, confidence, wind_speed):
     return "Good"
 
 def get_recommendation_status(suitability, risk):
-    if suitability == "Not Recommended" or risk == "High":    return "Stay indoors"
-    if suitability == "Use Caution" or risk in {"Medium","Low-Medium"}: return "Use caution"
-    return "Safe to go out"
+    if suitability == "Not Recommended" or risk == "High":    return "Not Recommended"
+    if suitability == "Use Caution" or risk in {"Medium","Low-Medium"}: return "Use Caution"
+    return "Good"
 
 def generate_decision_message(rain_label, confidence, temp, wind_speed):
     if rain_label == "Heavy rain":
@@ -566,6 +717,90 @@ def generate_decision_message(rain_label, confidence, temp, wind_speed):
     if temp >= 30:
         return "Conditions are stable. Good time to head out — stay hydrated in the heat."
     return "Conditions look good. A comfortable time for outdoor activity."
+
+def status_priority(status):
+    return {"Good": 0, "Use Caution": 1, "Not Recommended": 2}.get(status, 1)
+
+def max_status(*statuses):
+    return max(statuses, key=status_priority)
+
+def evaluate_activity(activity, rain_label, confidence, temp, wind_speed):
+    confidence = 0 if confidence is None else float(confidence)
+    temp = 0 if temp is None else float(temp)
+    wind_speed = 0 if wind_speed is None else float(wind_speed)
+    rain_expected = rain_label in {"Light rain", "Heavy rain"}
+    activity_name = ACTIVITY_META[activity]["name"]
+
+    status = "Good"
+    reasons = []
+
+    if activity == "Walking 🚶":
+        if rain_label == "Heavy rain":
+            status = "Not Recommended"
+            reasons.append(f"Heavy rain expected with {get_confidence_short(confidence).lower()} confidence")
+        if rain_label == "Light rain" and confidence >= 60:
+            status = max_status(status, "Use Caution")
+            reasons.append(f"Light rain likely with {get_confidence_short(confidence).lower()} confidence")
+        if wind_speed > 25:
+            status = max_status(status, "Use Caution")
+            reasons.append(f"Wind speed is high ({wind_speed:.0f} km/h)")
+
+    elif activity == "Beach 🏖️":
+        if temp < 24:
+            status = "Not Recommended"
+            reasons.append(f"Temperature is below beach comfort ({temp:.1f}°C)")
+        if wind_speed > 20:
+            status = max_status(status, "Use Caution")
+            reasons.append(f"Wind may be uncomfortable at the beach ({wind_speed:.0f} km/h)")
+        if rain_expected:
+            status = "Not Recommended"
+            reasons.append(f"{rain_label} expected with {get_confidence_short(confidence).lower()} confidence")
+
+    elif activity == "Outdoor Sports ⚽":
+        if wind_speed > 25:
+            status = "Not Recommended"
+            reasons.append(f"Wind speed is high ({wind_speed:.0f} km/h)")
+        if rain_expected:
+            status = max_status(status, "Use Caution")
+            reasons.append(f"{rain_label} expected with {get_confidence_short(confidence).lower()} confidence")
+
+    elif activity == "Driving 🚗":
+        if rain_label == "Heavy rain":
+            status = "Use Caution"
+            reasons.append(f"Heavy rain may reduce visibility")
+        if rain_expected and confidence > 75:
+            status = max_status(status, "Use Caution")
+            reasons.append("Strong signal for rain")
+
+    else:
+        suitability = get_outdoor_suitability(rain_label, confidence, wind_speed)
+        status = {
+            "Good": "Good",
+            "Use Caution": "Use Caution",
+            "Not Recommended": "Not Recommended",
+        }.get(suitability, "Use Caution")
+        if rain_label == "Heavy rain":
+            reasons.append(f"Heavy rain expected with {get_confidence_short(confidence).lower()} confidence")
+        elif rain_label == "Light rain" and confidence >= 60:
+            reasons.append(f"Light rain likely with {get_confidence_short(confidence).lower()} confidence")
+        if wind_speed >= 25:
+            reasons.append(f"Wind speed is high ({wind_speed:.0f} km/h)")
+
+    if not reasons:
+        reasons.append(f"Conditions fit {activity_name.lower()} right now")
+
+    suggestion = (
+        f"Good conditions for {activity_name.lower()}. You can continue with your plan."
+        if status == "Good"
+        else f"Consider switching activity or choosing another city for {activity_name.lower()}."
+    )
+
+    return {
+        "status": status,
+        "reasons": reasons,
+        "suggestion": suggestion,
+        "confidence_label": get_confidence_short(confidence),
+    }
 
 def add_trend_columns(df):
     out = df.copy()
@@ -596,39 +831,64 @@ def get_rain_trend_note(diff):
     if diff < -0.1: return "Rain intensity is easing."
     return "Rain signal remains stable."
 
-def build_city_ranking_table(all_preds):
+def build_city_ranking_table(all_preds, latest_weather, activity):
     if all_preds.empty:
         return all_preds
     latest = (
         all_preds.sort_values("created_at", ascending=False)
         .groupby("city", as_index=False).head(1).copy()
     )
+    if not latest_weather.empty:
+        latest = latest.merge(
+            latest_weather[
+                [
+                    "city",
+                    "temperature_2m",
+                    "wind_speed_10m",
+                    "precipitation",
+                    "timestamp",
+                ]
+            ],
+            on="city",
+            how="left",
+        )
     latest["Rain"]       = latest["rain_prediction"].map(RAIN_LABELS)
     latest["Confidence"] = latest["rain_probability"].round(0).astype(int)
     latest["Temp"]       = latest["predicted_temperature"].round(1)
-    latest["Suitability"] = latest.apply(
-        lambda r: get_outdoor_suitability(r["Rain"], r["rain_probability"], 0), axis=1
+    latest["Wind"]       = latest["wind_speed_10m"].fillna(0).round(1)
+    latest["Current Temp"] = latest["temperature_2m"].fillna(latest["Temp"]).round(1)
+    decisions = latest.apply(
+        lambda r: evaluate_activity(
+            activity,
+            r["Rain"],
+            r["rain_probability"],
+            r["Temp"],
+            r["Wind"],
+        ),
+        axis=1,
     )
+    latest["Recommendation"] = decisions.apply(lambda decision: decision["status"])
+    latest["Suitability"] = latest["Recommendation"]
+    latest["Decision Reason"] = decisions.apply(lambda decision: decision["reasons"][0])
     def score(row):
-        return {0:0,1:1,2:2}.get(int(row["rain_prediction"]),2) + row["rain_probability"]/100
+        return (
+            status_priority(row["Recommendation"]) * 10
+            + row["rain_probability"] / 100
+            + row["Wind"] / 1000
+        )
     latest["_score"] = latest.apply(score, axis=1)
     latest = latest.sort_values(["_score","city"]).reset_index(drop=True)
     latest["Rank"]            = range(1, len(latest)+1)
     latest["Confidence Band"] = latest["rain_probability"].apply(get_confidence_band)
-    latest["Recommendation"]  = latest["Suitability"].map({
-        "Good":"Safe to go out", "Use Caution":"Use caution", "Not Recommended":"Stay indoors",
-    }).fillna("Review conditions")
     return latest
 
 def weather_icon(rain_label):
     return {"Clear":"☀️","Light rain":"🌦️","Heavy rain":"🌧️"}.get(rain_label,"⛅")
 
 def city_takeaway(row, best, worst):
-    if row["city"] == best:  return "Strongest outdoor conditions right now."
-    if row["city"] == worst: return "Less favorable at the moment."
-    if row["Rain"] == "Light rain":  return "Light rain may affect short trips."
-    if row["Rain"] == "Heavy rain":  return "Conditions are unsettled right now."
-    return "Conditions look relatively steady."
+    if row["city"] == best:  return "Best match for the selected activity."
+    if row["city"] == worst: return "Weakest match for the selected activity."
+    return row.get("Decision Reason", "Conditions look relatively steady.")
 
 def conf_color(v):
     if v >= 75: return "var(--good)"
@@ -636,7 +896,7 @@ def conf_color(v):
     return "var(--risk)"
 
 def rec_tone(rec):
-    return {"Safe to go out":"good","Use caution":"caution","Stay indoors":"risk"}.get(rec,"caution")
+    return {"Good":"good","Use Caution":"caution","Not Recommended":"risk"}.get(rec,"caution")
 
 
 # ── Data load ─────────────────────────────────────────────────────────────────
@@ -651,9 +911,7 @@ if not cities:
     st.stop()
 
 all_predictions_df = load_all_predictions()
-ranking_df         = build_city_ranking_table(all_predictions_df)
-best_city  = ranking_df.iloc[0]["city"]  if not ranking_df.empty else None
-worst_city = ranking_df.iloc[-1]["city"] if not ranking_df.empty else None
+latest_weather_df = load_latest_weather_by_city()
 
 
 # ── Nav ───────────────────────────────────────────────────────────────────────
@@ -661,14 +919,25 @@ worst_city = ranking_df.iloc[-1]["city"] if not ranking_df.empty else None
 render_html("""
 <div class="wg-nav">
     <div class="wg-nav-brand">WeatherGo Cyprus</div>
-    <div class="wg-nav-sub">Outdoor decisions for Cyprus</div>
+    <div class="wg-nav-sub">Activity decisions for Cyprus</div>
 </div>
 """)
 
 
 # ── Controls ──────────────────────────────────────────────────────────────────
 
-col_city, col_time, col_spacer = st.columns([1.6, 1, 1.4])
+col_activity, col_city, col_time = st.columns([1.5, 1.4, 1])
+with col_activity:
+    render_html('<div class="wg-control-label">What are you planning?</div>')
+    activity = st.selectbox(
+        "What are you planning?",
+        ACTIVITY_OPTIONS,
+        key="activity_selector",
+        label_visibility="collapsed",
+        help="Choose the activity so the recommendation can match your plan.",
+    )
+    render_html('<div class="wg-control-hint">Recommendations adapt to the activity.</div>')
+
 with col_city:
     render_html('<div class="wg-control-label">City</div>')
     city = st.selectbox(
@@ -683,6 +952,10 @@ with col_time:
         "Time window", ["12 h","24 h"], horizontal=True, label_visibility="collapsed",
     )
     render_html('<div class="wg-control-hint">Recent period for trend and charts.</div>')
+
+ranking_df = build_city_ranking_table(all_predictions_df, latest_weather_df, activity)
+best_city = ranking_df.iloc[0]["city"] if not ranking_df.empty else None
+worst_city = ranking_df.iloc[-1]["city"] if not ranking_df.empty else None
 
 hours_to_load = 12 if time_window == "12 h" else 24
 
@@ -710,13 +983,35 @@ if not prediction_df.empty:
     prediction_time_text = pd.to_datetime(pred["created_at"]).strftime("%H:%M")
 
 confidence_band  = get_confidence_band(predicted_prob)
-risk             = get_risk_level(predicted_rain_label, predicted_prob) if predicted_prob else "Unknown"
-suitability      = get_outdoor_suitability(predicted_rain_label, predicted_prob, float(latest["wind_speed_10m"])) if predicted_prob else "Unknown"
-decision_status  = get_recommendation_status(suitability, risk) if predicted_prob else "Use caution"
-decision_message = generate_decision_message(
-    predicted_rain_label, predicted_prob,
-    float(latest["temperature_2m"]), float(latest["wind_speed_10m"])
-) if predicted_prob else "Recommendation pending — current readings are available below."
+confidence_metric_label = get_confidence_metric_label(predicted_rain_label)
+confidence_html = confidence_chip(predicted_prob)
+forecast_confidence_html = confidence_chip(predicted_prob, confidence_metric_label)
+confidence_guidance = get_confidence_guidance(predicted_prob)
+activity_decision = evaluate_activity(
+    activity,
+    predicted_rain_label,
+    predicted_prob,
+    predicted_temp if predicted_temp is not None else float(latest["temperature_2m"]),
+    float(latest["wind_speed_10m"]),
+) if predicted_prob is not None else {
+    "status": "Use Caution",
+    "reasons": ["Short-term prediction is not available yet"],
+    "suggestion": "Use the current readings below and keep plans flexible.",
+    "confidence_label": "Unavailable",
+}
+decision_status = activity_decision["status"]
+decision_reasons = activity_decision["reasons"]
+decision_suggestion = activity_decision["suggestion"]
+activity_name = ACTIVITY_META[activity]["name"]
+activity_emoji = ACTIVITY_META[activity]["emoji"]
+decision_message = f"{activity_emoji} Activity: {activity_name}. {confidence_guidance}"
+better_city = None
+if decision_status != "Good" and not ranking_df.empty:
+    better_matches = ranking_df[
+        (ranking_df["city"] != city) & (ranking_df["Recommendation"] == "Good")
+    ]
+    if not better_matches.empty:
+        better_city = better_matches.iloc[0]["city"]
 
 temp_trend_text, rain_trend_text, temp_diff, rain_diff = summarize_trends(weather_df)
 status_tone = STATUS_META[decision_status]["tone"]
@@ -732,43 +1027,41 @@ tab_main, tab_compare, tab_about = st.tabs(["Overview", "Across Cyprus", "About"
 with tab_main:
 
     # Hero recommendation
+    reasons_html = "".join(f"<li>{reason}</li>" for reason in decision_reasons)
+    better_city_html = (
+        f'<div class="wg-better-city">👉 Better option right now: {better_city} '
+        f'(Good conditions for {activity_name.lower()})</div>'
+        if better_city
+        else ""
+    )
     render_html(f"""
     <div class="wg-card wg-hero-card">
-        <div class="wg-hero-city">{city} &nbsp;·&nbsp; Updated {last_update_text}</div>
+        <div class="wg-hero-city">{city} &nbsp;·&nbsp; {activity_emoji} {activity_name} &nbsp;·&nbsp; Updated {last_update_text}</div>
         <div class="wg-hero-status">
-            <span class="dot-{status_tone}">●</span> {decision_status}
+            <span class="dot-{status_tone}">●</span> Recommendation: {decision_status}
         </div>
         <div class="wg-hero-message">{decision_message}</div>
+        <div class="wg-reason-block">
+            <div class="wg-reason-panel">
+                <div class="wg-reason-title">Reason</div>
+                <ul class="wg-reason-list">{reasons_html}</ul>
+            </div>
+            <div class="wg-reason-panel">
+                <div class="wg-reason-title">Suggestion</div>
+                <div class="wg-suggestion">👉 {decision_suggestion}</div>
+                {better_city_html}
+            </div>
+        </div>
         <div class="wg-pills">
+            <div class="wg-pill">Activity: {activity_emoji} {activity_name}</div>
             <div class="wg-pill">Outlook: {predicted_rain_label}</div>
-            <div class="wg-pill">{confidence_band}</div>
-            <div class="wg-pill">Risk: {risk}</div>
+            <div class="wg-pill">Wind: {latest["wind_speed_10m"]:.1f} km/h</div>
         </div>
+        <div class="wg-confidence-note">Confidence reflects how consistent recent signals are. It is not a guarantee.</div>
     </div>
     """)
 
-    # Why this recommendation — 4 support cells
-    render_html(f"""
-    <div class="wg-support-grid">
-        <div class="wg-support-item">
-            <div class="wg-label">Risk level</div>
-            <div class="wg-support-value">{risk}</div>
-        </div>
-        <div class="wg-support-item">
-            <div class="wg-label">Outdoor suitability</div>
-            <div class="wg-support-value">{suitability}</div>
-        </div>
-        <div class="wg-support-item">
-            <div class="wg-label">Rain outlook</div>
-            <div class="wg-support-value">{predicted_rain_label}</div>
-        </div>
-        <div class="wg-support-item">
-            <div class="wg-label">Confidence</div>
-            <div class="wg-support-value">{confidence_band.replace(" confidence","")}</div>
-        </div>
-    </div>
-    """)
-
+   
     # Prediction summary cards
     render_html('<div class="wg-section-head">Prediction</div>')
     render_html(f"""
@@ -785,8 +1078,8 @@ with tab_main:
         </div>
         <div class="wg-card wg-summary-card">
             <div class="wg-label">Confidence</div>
-            <div class="wg-summary-value">{f"{int(predicted_prob)}%" if predicted_prob else "—"}</div>
-            <div class="wg-summary-copy">{CONFIDENCE_COPY[confidence_band]}</div>
+            <div class="wg-summary-value">{get_confidence_short(predicted_prob)}</div>
+            <div class="wg-summary-copy">{CONFIDENCE_COPY[confidence_band]} {f"Signal strength: {int(predicted_prob)}%." if predicted_prob is not None else ""}</div>
         </div>
     </div>
     """)
@@ -850,10 +1143,10 @@ with tab_main:
     chart_col_1, chart_col_2 = st.columns(2)
     with chart_col_1:
         st.caption("Temperature over selected period")
-        st.area_chart(indexed_df[["temperature_2m"]], color=["#4a90d9"], height=200, use_container_width=True)
+        st.area_chart(indexed_df[["temperature_2m"]], color=["#4a90d9"], height=200, width="stretch")
     with chart_col_2:
         st.caption("Precipitation over selected period")
-        st.area_chart(indexed_df[["precipitation"]], color=["#5aab8c"], height=200, use_container_width=True)
+        st.area_chart(indexed_df[["precipitation"]], color=["#5aab8c"], height=200, width="stretch")
 
 
 # ── Tab: Across Cyprus ────────────────────────────────────────────────────────
@@ -861,14 +1154,14 @@ with tab_main:
 with tab_compare:
 
     takeaway_sentence = (
-        f"Right now, {best_city} offers the strongest outdoor conditions across Cyprus."
+        f"Right now, {best_city} is the best option for {activity_name.lower()}."
         if best_city else "City outlooks will appear here once data is available."
     )
 
     render_html(f"""
     <div class="wg-card wg-compare-header">
-        <div class="wg-label">Best conditions across Cyprus</div>
-        <div class="wg-compare-headline">Where should you go today?</div>
+        <div class="wg-label">{activity_emoji} Activity-aware city comparison</div>
+        <div class="wg-compare-headline">Where should you go for {activity_name.lower()}?</div>
         <div class="wg-compare-sub">{takeaway_sentence}</div>
     </div>
     """)
@@ -882,15 +1175,16 @@ with tab_compare:
             badge       = ""
             if row["city"] == best_city:
                 extra_class = " featured"
-                badge = '<span class="wg-badge good">Best right now</span>'
+                badge = f'<span class="wg-badge good">Best for {activity_name.lower()}</span>'
             elif row["city"] == worst_city:
                 extra_class = " warn"
-                badge = '<span class="wg-badge risk">Highest risk</span>'
-            elif row["Suitability"] == "Use Caution":
+                badge = '<span class="wg-badge risk">Weakest match</span>'
+            elif row["Recommendation"] == "Use Caution":
                 badge = '<span class="wg-badge caution">Use caution</span>'
 
             tone = rec_tone(row["Recommendation"])
             tk   = city_takeaway(row, best_city, worst_city)
+            city_confidence_html = confidence_chip(row["Confidence"])
 
             rows_html += f"""
             <div class="wg-card wg-city-row{extra_class}">
@@ -900,17 +1194,21 @@ with tab_compare:
                         <div class="wg-city-name">{row["city"]}</div>
                         {badge}
                         <div class="wg-city-takeaway">{tk}</div>
+                        <div class="wg-city-confidence">{city_confidence_html}</div>
                     </div>
                 </div>
                 <div>
-                    <div class="wg-city-metric-label">Temperature</div>
-                    <div class="wg-city-metric-value">{row["Temp"]:.1f}°C</div>
+                    <div class="wg-city-metric-label">Activity fit</div>
+                    <div class="wg-city-metric-value" style="color:var(--{tone});">{row["Recommendation"]}</div>
                 </div>
                 <div>
                     <div class="wg-city-metric-label">Rain outlook</div>
                     <div class="wg-city-metric-value">{row["Rain"]}</div>
                 </div>
-
+                <div>
+                    <div class="wg-city-metric-label">Wind / Temp</div>
+                    <div class="wg-city-metric-value">{row["Wind"]:.1f} km/h · {row["Temp"]:.1f}°C</div>
+                </div>
             </div>
             """
         render_html(f'<div class="wg-city-list">{rows_html}</div>')
@@ -920,7 +1218,10 @@ with tab_compare:
 
 with tab_about:
     render_html("""
-
+    <div class="wg-card wg-about-card">
+        <h2>Decision assistant weather dashboard</h2>
+        <p>WeatherGo Cyprus starts with what you want to do, then translates rain, wind, temperature into a practical recommendation.</p>
+    </div>
     """)
 
 
