@@ -2,6 +2,7 @@ import sqlite3
 from pathlib import Path
 from textwrap import dedent
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -109,15 +110,26 @@ h1,h2,h3,h4,p,div,span,label {
     color: var(--text-soft);
     cursor: pointer;
 }
+[data-testid="stRadio"] label p,
+[data-testid="stRadio"] label span,
+[data-testid="stRadio"] label div {
+    color: var(--text) !important;
+}
 
 /* Charts */
 [data-testid="stArrowVegaLiteChart"],
 [data-testid="stVegaLiteChart"] {
-    background: var(--surface);
+    background: var(--surface) !important;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 0.5rem;
     box-shadow: var(--shadow);
+}
+[data-testid="stArrowVegaLiteChart"] canvas,
+[data-testid="stVegaLiteChart"] canvas,
+[data-testid="stArrowVegaLiteChart"] svg,
+[data-testid="stVegaLiteChart"] svg {
+    background: var(--surface) !important;
 }
 
 /* Tabs */
@@ -802,6 +814,50 @@ def add_trend_columns(df):
     out["rain_change_1h"] = out["precipitation"].diff()
     return out
 
+def build_light_area_chart(df, value_col, color, y_title):
+    chart_df = df[["timestamp", value_col]].rename(columns={value_col: "value"})
+    return (
+        alt.Chart(chart_df)
+        .mark_area(
+            line={"color": color, "strokeWidth": 2},
+            color=alt.Gradient(
+                gradient="linear",
+                stops=[
+                    alt.GradientStop(color=f"{color}66", offset=0),
+                    alt.GradientStop(color=f"{color}14", offset=1),
+                ],
+                x1=1,
+                x2=1,
+                y1=1,
+                y2=0,
+            ),
+        )
+        .encode(
+            x=alt.X(
+                "timestamp:T",
+                title=None,
+                axis=alt.Axis(labelColor="#6e6e73", tickColor="#d2d2d7", gridColor="#ececf0"),
+            ),
+            y=alt.Y(
+                "value:Q",
+                title=y_title,
+                axis=alt.Axis(
+                    titleColor="#6e6e73",
+                    labelColor="#6e6e73",
+                    tickColor="#d2d2d7",
+                    gridColor="#ececf0",
+                ),
+            ),
+            tooltip=[
+                alt.Tooltip("timestamp:T", title="Time"),
+                alt.Tooltip("value:Q", title=y_title, format=".2f"),
+            ],
+        )
+        .properties(height=200, background="#ffffff")
+        .configure_view(strokeWidth=0)
+        .configure_axis(domainColor="#d2d2d7")
+    )
+
 def summarize_trends(df):
     if len(df) < 2:
         return "Stable", "Stable", 0.0, 0.0
@@ -1128,14 +1184,19 @@ with tab_main:
     """)
 
     # Charts
-    indexed_df = weather_df.set_index("timestamp")
     chart_col_1, chart_col_2 = st.columns(2)
     with chart_col_1:
         st.caption("Temperature over selected period")
-        st.area_chart(indexed_df[["temperature_2m"]], color=["#4a90d9"], height=200, width="stretch")
+        st.altair_chart(
+            build_light_area_chart(weather_df, "temperature_2m", "#4a90d9", "Temperature (C)"),
+            use_container_width=True,
+        )
     with chart_col_2:
         st.caption("Precipitation over selected period")
-        st.area_chart(indexed_df[["precipitation"]], color=["#5aab8c"], height=200, width="stretch")
+        st.altair_chart(
+            build_light_area_chart(weather_df, "precipitation", "#5aab8c", "Precipitation (mm)"),
+            use_container_width=True,
+        )
 
 
 # ── Tab: Across Cyprus ────────────────────────────────────────────────────────
