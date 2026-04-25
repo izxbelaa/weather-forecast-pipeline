@@ -913,7 +913,6 @@ latest_weather_df = load_latest_weather_by_city()
 render_html("""
 <div class="wg-nav">
     <div class="wg-nav-brand">WeatherGo Cyprus</div>
-    <div class="wg-nav-sub">Activity decisions for Cyprus</div>
 </div>
 """)
 
@@ -930,7 +929,6 @@ with col_activity:
         label_visibility="collapsed",
         help="Choose the activity so the recommendation can match your plan.",
     )
-    render_html('<div class="wg-control-hint">Recommendations adapt to the activity.</div>')
 
 with col_city:
     render_html('<div class="wg-control-label">City</div>')
@@ -938,14 +936,12 @@ with col_city:
         "City", cities, key="city_selector", label_visibility="collapsed",
         help="Choose a Cyprus city to view its current recommendation.",
     )
-    render_html('<div class="wg-control-hint">Choose a city to view its current recommendation.</div>')
 
 with col_time:
     render_html('<div class="wg-control-label">Time window</div>')
     time_window = st.radio(
         "Time window", ["12 h","24 h"], horizontal=True, label_visibility="collapsed",
     )
-    render_html('<div class="wg-control-hint">Recent period for trend and charts.</div>')
 
 ranking_df = build_city_ranking_table(all_predictions_df, latest_weather_df, activity)
 best_city = ranking_df.iloc[0]["city"] if not ranking_df.empty else None
