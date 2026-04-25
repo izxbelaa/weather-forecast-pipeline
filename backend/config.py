@@ -9,7 +9,7 @@ CITIES = [
 
 today = datetime.today()
 
-START_DATE = (today - timedelta(days=90)).strftime("%Y-%m-%d")
+START_DATE = (today - timedelta(days=365)).strftime("%Y-%m-%d")
 END_DATE = today.strftime("%Y-%m-%d")
 
 HOURLY_VARS = [
