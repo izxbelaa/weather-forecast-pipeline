@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project is a real-time weather monitoring and short-term prediction
+This project is a real-time weather decision assistant weather
 system developed for the **CSE525 Data Science** course.
 
 The system collects weather data from the **Open-Meteo API**, stores it
@@ -86,6 +86,14 @@ pip install -r requirements.txt
 
 
 ------------------------------------------------------------------------
+### 5. Run pipeline script
+
+``` bash
+python3 pipeline/run_pipeline.py   
+```
+
+
+------------------------------------------------------------------------
 
 ## Running the Streamlit UI
 
@@ -97,20 +105,6 @@ The dashboard will open in your browser:
 
 http://localhost:8501
 
-------------------------------------------------------------------------
-
-## Phase A Goal
-
-For Phase A the team will complete:
-
--   problem definition
--   research questions and hypotheses
--   API selection
--   initial database design
--   early prototype dashboard
--   baseline ML model planning
-
-------------------------------------------------------------------------
 
 ## Important Notes
 
